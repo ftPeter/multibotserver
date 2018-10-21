@@ -1,8 +1,9 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
+    path('', views.home, name='home'),
+    path('refresh', views.refresh_robot_data, name='refresh'),
+    path('<str:action>/<int:pk>', views.perform_action, name='perform_action'),
 ]
-
