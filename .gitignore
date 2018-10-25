@@ -76,3 +76,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.idea/
+bigboard/migrations/0001_initial.py
+bigboard/migrations/0002_auto_20181025_1407.py

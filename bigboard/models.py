@@ -13,14 +13,14 @@ class RobotType(PolymorphicModel):
 
 class RobotTypeA(RobotType):
     typeName = models.CharField(max_length=200, default='TypeA', editable=False)
-    actions = models.CharField(max_length=200, default='Change Color, Move Left', editable=False)
+    actions = models.CharField(max_length=200, default='Change Color, Check Battery', editable=False)
 
     def get_actions(self):
         return self.actions.split(", ")
 
 class RobotTypeB(RobotType):
     typeName = models.CharField(max_length=200, default='TypeB', editable=False)
-    actions = models.CharField(max_length=200, default='Change Color, Move Right', editable=False)
+    actions = models.CharField(max_length=200, default='Change Color, Check Battery', editable=False)
 
     def get_actions(self):
         return self.actions.split(", ")

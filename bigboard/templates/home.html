@@ -56,12 +56,12 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <form id="{{robot.id}}">
+                                    <form id="{{robot.id}} {{robot.name}}">
                                     <textarea class="form-control" rows="1" name="input"></textarea>
                                     </form>
                                 </td>
                                 <td>
-                                    <button type="submit" form="{{robot.id}}" class="btn btn-primary">Submit</button>
+                                    <button type="submit" form="{{robot.id}} {{robot.name}}" class="btn btn-primary">Submit</button>
                                 </td>
                             </tr>
                         {% endfor %}

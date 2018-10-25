@@ -2,7 +2,10 @@ $(function(){
     $("form").submit(function(event){
         event.preventDefault();
         input = $(this).find("textarea").val();
-        robotId = $(this).attr('id');
+
+        robotId = $(this).attr('id').split(" ")[0];
+        robotName = $(this).attr('id').split(" ")[1];
+
         action = $("#" + robotId + "-action").val().replace(/\s/g, '').toLowerCase();
         $.ajax({
             url: action + '/' + robotId,
@@ -17,7 +20,8 @@ $(function(){
                     $("#error").text(data.error);
                 }
                 else {
-                    alert('success');
+                    message = "Robot " + robotName + ": " + action + "\n" + data.result;
+                    alert(message);
                 }
             }
         });

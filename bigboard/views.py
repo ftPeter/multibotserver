@@ -24,6 +24,7 @@ def home(request):
                 active.append(robot)
             else:
                 inactive.append(robot)
+
         except Exception:
             inactive.append(robot)
 
@@ -37,6 +38,7 @@ def refresh_robot_data(request):
     result = {}
     try:
         ssh.connect("multirobotics.peterklemperer.com", 22, "multirobotics", "ZwUhQmcym8", timeout=5)
+
         command = "cd multirobotics.peterklemperer.com; cd multi-robotics-status; cd _data; cat *.yml"
         (stdin, stdout, stderror) = ssh.exec_command(command, timeout=5)
         if len(stderror.readlines()) > 0:
@@ -46,6 +48,7 @@ def refresh_robot_data(request):
             update_database(output)
     except Exception:
         result['error'] = 'Failed to connect/fetch data from server.'
+
     return JsonResponse(result)
 
 def update_database(output):
@@ -78,7 +81,7 @@ def perform_action(request, action, pk):
         if action in allActions:
             perform(robot, action, input, result)
         else:
-            result['error'] = "Robot " + robot.name + ' does not have action ' + action
+            result['error'] = "Robot " + robot.name + " does not have action " + action
     except Robot.DoesNotExist:
         result['error'] = "Robot with id " + str(pk) + " does not exist"
     return JsonResponse(result)
@@ -89,10 +92,19 @@ def perform(robot, action, input, result):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
         ssh.connect(robot.ip, 22, "mhc", "mhcrobots", timeout=5)
-        command = "cd actions; echo " + input + " > " + action + ".txt"
-        (stdin, stdout, stderror) = ssh.exec_command(command, timeout=5)
+        command = ["cd multi-robotics/MRS-Controller/romi_utilities/"]
+
+        if action == "changecolor":
+            command.append("python3 pixel_utility.py " + input)
+        elif action == "checkbattery":
+            command.append("python3 battery_utility.py")
+
+        (stdin, stdout, stderror) = ssh.exec_command('; '.join(command), timeout=5)
         if len(stderror.readlines()) > 0:
-            result['error'] = 'Cannot perform action on robot ' + robot.name
+            result['error'] = 'Cannot perform action ' + action + ' on robot ' + robot.name
+        else:
+            result['result'] = ''.join(stdout.readlines())
+
     except Exception:
-        result['error'] = 'Cannot connect to / perform action on robot ' + robot.name
+        result['error'] = 'Cannot connect to robot ' + robot.name
 
