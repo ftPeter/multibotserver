@@ -3,12 +3,32 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import paramiko
+import pytz
 import re
+from datetime import datetime
 from .models import *
 
 def home(request):
     robots = Robot.objects.all()
-    return render(request, 'home.html', {'robots': robots})
+
+    active = []
+    inactive = []
+    for robot in robots:
+        time = robot.time
+        try:
+            datetime_obj = datetime.strptime(time, '%Y-%m-%d_%H-%M-%S').replace(tzinfo=None)
+            now = datetime.now(pytz.timezone('US/Eastern')).replace(tzinfo=None)
+            difference = (now - datetime_obj).total_seconds() / 60.0
+
+            if difference <= 15:
+                active.append(robot)
+            else:
+                inactive.append(robot)
+        except Exception:
+            inactive.append(robot)
+
+    return render(request, 'home.html', {'activeRobots': active, 'inactiveRobots': inactive})
+
 
 @method_decorator(csrf_exempt)
 def refresh_robot_data(request):

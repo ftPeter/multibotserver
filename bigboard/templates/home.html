@@ -43,7 +43,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for robot in robots%}
+                        {% for robot in activeRobots %}
                             <tr>
                                 <td>{{robot.name}}</td>
                                 <td>{{robot.time}}</td>
@@ -57,11 +57,42 @@
                                 </td>
                                 <td>
                                     <form id="{{robot.id}}">
-                                    <textarea class="form-control" rows="1" name="input" required></textarea>
+                                    <textarea class="form-control" rows="1" name="input"></textarea>
                                     </form>
                                 </td>
                                 <td>
                                     <button type="submit" form="{{robot.id}}" class="btn btn-primary">Submit</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-5 mb-3">
+                <span class="h3 text-muted mr-4 align-middle">Inactive Robots:</span>
+            </div>
+            <div>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Time</th>
+                            <th>IP</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for robot in inactiveRobots %}
+                            <tr>
+                                <td>{{robot.name}}</td>
+                                <td>{{robot.time}}</td>
+                                <td>{{robot.ip}}</td>
+                                <td>
+                                    <select class="form-control" id="{{robot.id}}-action">
+                                        {% for action in robot.type.get_actions%}
+                                        <option>{{action}}</option>
+                                        {% endfor %}
+                                    </select>
                                 </td>
                             </tr>
                         {% endfor %}
