@@ -1,0 +1,18 @@
+{% extends "index.html" %}
+{% block title %}MHC Robotics | {{robot.name}}'s Gallery{% endblock %}
+
+{% block nav %}
+      <li class="nav-item">
+        <a class="nav-link" href="/">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/gallery">Gallery</a>
+      </li>
+{% endblock %}
+
+{% block content %}
+    <br>
+    <div class="alert alert-danger">
+      <strong>Error! </strong><span id="error">{{error}}</span>
+    </div>
+{% endblock %}

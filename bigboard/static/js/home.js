@@ -8,7 +8,7 @@ $(function(){
 
         action = $("#" + robotId + "-action").val().replace(/\s/g, '').toLowerCase();
         $.ajax({
-            url: action + '/' + robotId,
+            url: robotId + '/' + action,
             type: 'post',
             dataType: 'json',
             data: {
