@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
 import paramiko
 import pytz
 import re
@@ -94,11 +95,15 @@ def perform(robot, action, input, result):
         command = ["cd multi-robotics/MRS-Controller/romi_utilities/"]
         if action == "changecolor":
             command.append("python3 pixel_utility.py " + input)
+
         elif action == "checkbattery":
             command.append("python3 battery_utility.py")
+
         elif action == "takepicture":
             command.append("cd /home/mhc/multi-robotics/gallery/")
-            c = 'curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@1.png" '
+            filename = str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".jpg"
+            command.append("raspistill -o " + filename)
+            c = 'curl -s -i -X POST -H "Content-Type: multipart/form-data" -F "data=' + filename + '" '
             c += 'http://multibot.cs.mtholyoke.edu/' + str(robot.id) + '/uploadimage'
             command.append(c)
 
