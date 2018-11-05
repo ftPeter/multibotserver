@@ -103,11 +103,11 @@ def perform(robot, action, input, result):
             command.append("cd /home/mhc/multi-robotics/gallery/")
             filename = str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".jpg"
             command.append("raspistill -o " + filename)
-            c = 'curl -s -i -X POST -H "Content-Type: multipart/form-data" -F "data=' + filename + '" '
+            c = 'curl -s -S -i -X POST -H "Content-Type: multipart/form-data" -F "data=@' + filename + '" '
             c += 'http://multibot.cs.mtholyoke.edu/' + str(robot.id) + '/uploadimage'
             command.append(c)
 
-        (stdin, stdout, stderror) = ssh.exec_command('; '.join(command), timeout=5)
+        (stdin, stdout, stderror) = ssh.exec_command('; '.join(command), timeout=10)
         if len(stderror.readlines()) > 0:
             result['error'] = 'Cannot perform action ' + action + ' on robot ' + robot.name
         else:

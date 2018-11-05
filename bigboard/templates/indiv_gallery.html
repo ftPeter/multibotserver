@@ -15,7 +15,7 @@
     <span class="h3 text-muted mr-4 align-middle">{{robot.name}}'s Gallery: </span>
 </div>
 <div class="row">
-    {% for image in robot.type.gallery.all %}
+    {% for image in robot.type.gallery.all reversed %}
       <div class="col-md-6 p-2">
         <img class="w-100 img-fluid img-thumbnail" src="{{MEDIA_URL}}{{image.image}}" class=" img-responsive" />
         <p class="text-center">{{image.timestamp}}</p>
