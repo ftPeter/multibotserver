@@ -8,6 +8,7 @@ class Robot(models.Model):
     ip = models.CharField(max_length=200)
     time = models.CharField(max_length=200)
     type = models.OneToOneField('RobotType', on_delete=models.CASCADE,)
+    active = models.BooleanField(default=False)
 
 class RobotType(PolymorphicModel):
     pass

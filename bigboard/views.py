@@ -6,26 +6,12 @@ from datetime import datetime
 import paramiko
 import pytz
 import re
-from datetime import datetime
 from .models import *
 
 ### HOMEPAGE
 def home(request):
-    robots = Robot.objects.all()
-    active = []
-    inactive = []
-    for robot in robots:
-        time = robot.time
-        try:
-            datetime_obj = datetime.strptime(time, '%Y-%m-%d_%H-%M-%S').replace(tzinfo=None)
-            now = datetime.now(pytz.timezone('US/Eastern')).replace(tzinfo=None)
-            difference = (now - datetime_obj).total_seconds() / 60.0
-            if difference <= 15:
-                active.append(robot)
-            else:
-                inactive.append(robot)
-        except Exception:
-            inactive.append(robot)
+    active = Robot.objects.filter(active=True)
+    inactive = Robot.objects.filter(active=False)
     return render(request, 'home.html', {'activeRobots': active, 'inactiveRobots': inactive})
 
 
@@ -56,16 +42,31 @@ def update_database(output):
         line = re.split(': |\n', i)
         robot[line[0]] = line[1]
         if line[0] == 'ip':
+            active = get_active_status(robot['time'])
             try:
                 rb = Robot.objects.get(ip=robot['ip'])
                 rb.name = robot['robot']
                 rb.time = robot['time']
+                rb.active = active
                 rb.save()
             except Robot.DoesNotExist:
                 rb = Robot(ip=robot['ip'], name=robot['robot'], time=robot['time'])
                 rb.type = RobotTypeA.objects.create()
+                rb.active = active
                 rb.save()
             robot = {}
+
+def get_active_status(time):
+    try:
+        datetime_obj = datetime.strptime(time, '%Y-%m-%d_%H-%M-%S').replace(tzinfo=None)
+        now = datetime.now(pytz.timezone('US/Eastern')).replace(tzinfo=None)
+        difference = (now - datetime_obj).total_seconds() / 60.0
+        if difference <= 15:
+            return True
+        else:
+            return False
+    except Exception:
+        return False
 
 
 
