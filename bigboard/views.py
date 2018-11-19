@@ -44,15 +44,14 @@ def update_database(output):
         if line[0] == 'ip':
             active = get_active_status(robot['time'])
             try:
-                rb = Robot.objects.get(ip=robot['ip'])
-                rb.name = robot['robot']
+                rb = Robot.objects.get(name=robot['robot'])
+                rb.ip = robot['ip']
                 rb.time = robot['time']
                 rb.active = active
                 rb.save()
             except Robot.DoesNotExist:
-                rb = Robot(ip=robot['ip'], name=robot['robot'], time=robot['time'])
+                rb = Robot(ip=robot['ip'], name=robot['robot'], time=robot['time'], active=active)
                 rb.type = RobotTypeA.objects.create()
-                rb.active = active
                 rb.save()
             robot = {}
 
