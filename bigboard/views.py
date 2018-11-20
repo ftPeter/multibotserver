@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
+from multiprocessing import Process, Manager
 import paramiko
 import pytz
 import re
@@ -205,8 +206,67 @@ def broadcast(request):
 def show_formation(request):
     return render(request, 'formation.html', {})
 
+@method_decorator(csrf_exempt)
 def formation(request):
-    return
+    result = {}
+
+    if request.method == 'POST':
+        input = request.POST.get('input', '')
+        try:
+            followers = int(request.POST.get('followers', 1))
+        except:
+            followers = 1
+
+        if followers == 1:
+            start_followers(input, result)
+        else:
+            start_leader(input, result)
+    return JsonResponse(result)
+
+
+def start_followers(data, result):
+    robot_list = []
+    robot_list.append(Robot.objects.get(name="brook"))
+    robot_list.append(Robot.objects.get(name="egypt"))
+    robot_list.append(Robot.objects.get(name="danube"))
+    robot_list.append(Robot.objects.get(name="calumet"))
+
+    with Manager() as manager:
+        error_list = manager.list()
+        processes = []
+        for robot in robot_list:
+            command = ["cd multi-robotics/MRS-Controller/romi_utilities/",
+                       './start_romi.py --name ' + robot.name + ' --formation ' + data + ' &']
+            a_process = Process(target=start_formation, args=(robot, command, error_list, 'startFollowers'))
+            processes.append(a_process)
+
+        for process in processes:
+            process.start()
+        for process in processes:
+            process.join()
+
+        if len(error_list) > 0:
+            result['error'] = [x for x in error_list]
+
+
+def start_leader(data, result):
+    leader = Robot.objects.get(name="green")
+    command = ["cd multi-robotics/robots/Romi-Dual-Leader", "./start_leader.py --" + data + ' &']
+    error_list = []
+    start_formation(leader, command, error_list, 'startLeader')
+    if len(error_list) > 0:
+        result['error'] = [x for x in error_list]
+
+
+def start_formation(robot, command, error_list, action):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        ssh.connect(robot.ip, 22, "mhc", "mhcrobots", timeout=5)
+        (stdin, stdout, stderror) = ssh.exec_command('; '.join(command), timeout=10)
+    except Exception:
+        error_list.append('Cannot connect to robot ' + robot.name)
+
 
 
 # helper functions

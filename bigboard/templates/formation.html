@@ -1,0 +1,39 @@
+{% extends "index.html" %}
+{% block title %}MHC Robotics | Formation{% endblock %}
+{% load static %}
+
+{% block content %}
+    <div class="mt-5 mb-3">
+        <span class="h3 text-muted mr-4 align-middle">Formation: </span>
+    </div>
+    <div class="alert danger alert-danger" hidden>
+        <strong>Error! </strong><span id="error"></span>
+    </div>
+    <div class="alert success alert-success" hidden>
+        <span>Formation Experiment started!</span>
+    </div>
+    <p>Leader (Green) and Followers (Calumet, Brook, Danube, Egypt) </p>
+    <div>
+        <div class="row mb-2">
+            <div class="col-md-2"><span class="align-middle">Formation: </span></div>
+            <div class="col-md-10"><form id="formation"><textarea class="form-control" rows="1" name="formation" required>square_formation</textarea></form></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2"><span class="align-middle">Leader Path: </span></div>
+            <div class="col-md-10"><form id="leader-path"><textarea class="form-control" rows="1" name="leader-path" required>box</textarea></form></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2"><span class="align-middle">Overhead Camera: </span></div>
+            <div class="col-md-10"><input type="checkbox" name="camera"/></div>
+        </div>
+        <div class="row my-2 text-center">
+            <div class="col-md-3"></div>
+            <div class="col-md-3"><button type="submit" form="formation" class="btn btn-primary btn-block">Start Followers</button></div>
+            <div class="col-md-3" id="leader" hidden><button type="submit" form="leader-path" class="btn btn-primary btn-block">Start Leader</button></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/formation.js' %}"></script>
+{% endblock %}
