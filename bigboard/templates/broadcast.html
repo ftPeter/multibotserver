@@ -1,0 +1,68 @@
+{% extends "index.html" %}
+{% block title %}MHC Robotics | Broadcast{% endblock %}
+{% load static %}
+
+{% block content %}
+    <div class="alert alert-danger" hidden>
+      <strong>Error! </strong><span id="error"></span>
+    </div>
+    <div class="mt-5 mb-3">
+        <span class="h3 text-muted mr-4 align-middle">Broadcast: </span>
+    </div>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th class="w-25">Active Robots</th>
+                <th>Actions</th>
+                <th>Input</th>
+                <th>Submit</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="align-middle">
+                    {% for robot in robots %}
+                     <div class="d-inline-block ml-2"><input class="robot-check" type="checkbox" value="{{robot.pk}}" /> {{robot.name}}</div>
+                    {% endfor %}
+                </td>
+                <td class="align-middle">
+                    <select class="form-control" id="action">
+                        {% for action in actions %}
+                        <option>{{action}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td class="align-middle">
+                    <form id="broadcast">
+                    <textarea class="form-control" rows="1" name="input"></textarea>
+                    </form>
+                </td>
+                <td class="align-middle">
+                    <button type="submit" form="broadcast" class="btn btn-primary">Submit</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="result" hidden>
+        <div class="mt-5 mb-3">
+            <span class="h3 text-muted mr-4 align-middle">Results:</span>
+        </div>
+        <div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Result</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody id="result-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/broadcast.js' %}"></script>
+{% endblock %}

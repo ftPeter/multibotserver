@@ -23,8 +23,18 @@
             <h2 class="text-muted mr-4">
                 MHC Robotics
             </h2>
-            {% block nav %}
-            {% endblock %}
+                <li class="nav-item">
+                    <a class="nav-link" id="home-tab" href="/">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="gallery-tab" href="/gallery">Gallery</a>
+                  </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="broadcast-tab" href="/broadcast">Broadcast</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="formation-tab" href="/formation">Formation</a>
+                </li>
             </ul>
 
             {% block content %}
@@ -35,6 +45,8 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/scripts.js' %}"></script>
-    <script src="{% static 'js/home.js' %}"></script>
+    <script src="{% static 'js/index.js' %}"></script>
+    {% block script %}
+    {% endblock %}
   </body>
 </html>
