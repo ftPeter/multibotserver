@@ -9,7 +9,7 @@ $(function(){
             dataType: 'json',
             data: {
                 'input': formation,
-                'followers': 1,
+                'action': 'followers',
             },
             success: function(data) {
                 if (data.error) {
@@ -36,7 +36,7 @@ $(function(){
             dataType: 'json',
             data: {
                 'input': path,
-                'followers': 0,
+                'action': 'leader',
             },
             success: function(data) {
                 if (data.error) {
@@ -49,6 +49,19 @@ $(function(){
                     $(".success").removeAttr('hidden');
                 }
             }
+        });
+    });
+
+    $("#cancel").click(function(){
+        $.ajax({
+            url: "actions/formation",
+            type: 'post',
+            dataType: 'json',
+            data: {
+                'action': 'cancel',
+            },
+            success: function(data) {
+                }
         });
     });
 });

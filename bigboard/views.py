@@ -212,18 +212,59 @@ def formation(request):
 
     if request.method == 'POST':
         input = request.POST.get('input', '')
-        try:
-            followers = int(request.POST.get('followers', 1))
-        except:
-            followers = 1
-
-        if followers == 1:
+        action = request.POST.get('action', '')
+        if action == 'followers':
             start_followers(input, result)
-        else:
+        elif action == 'leader':
             start_leader(input, result)
+        else:
+            stop_formation()
     return JsonResponse(result)
 
 
+
+#### STOP FORMATION EXPERIMENT - KILL ALL RUNNING PROCESSES
+def stop_formation():
+    robot_list = []
+    robot_list.append(Robot.objects.get(name="brook"))
+    robot_list.append(Robot.objects.get(name="egypt"))
+    robot_list.append(Robot.objects.get(name="danube"))
+    robot_list.append(Robot.objects.get(name="calumet"))
+    robot_list.append(Robot.objects.get(name="green"))
+
+    processes = []
+    for robot in robot_list:
+        process = Process(target=kill_formation_process, args=(robot,))
+        processes.append(process)
+
+    for process in processes:
+        process.start()
+    for process in processes:
+        process.join()
+
+
+def kill_formation_process(robot):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        ssh.connect(robot.ip, 22, "mhc", "mhcrobots", timeout=5)
+        (stdin, stdout, stderror) = ssh.exec_command("ps -A", timeout=10)
+        ports = []
+        for line in stdout.readlines():
+            if "start_leader" in line or "start_romi" in line:
+                ports.append(line.split('?')[0].strip())
+
+        if len(ports) > 0:
+            commands = []
+            for port in ports:
+                commands.append("kill " + port)
+            (stdin, stdout, stderror) = ssh.exec_command('; '.join(commands), timeout=10)
+    except Exception:
+        pass
+
+
+
+#### START FORMATION EXPERIMENT
 def start_followers(data, result):
     robot_list = []
     robot_list.append(Robot.objects.get(name="brook"))
@@ -237,7 +278,7 @@ def start_followers(data, result):
         for robot in robot_list:
             command = ["cd multi-robotics/MRS-Controller/romi_utilities/",
                        './start_romi.py --name ' + robot.name + ' --formation ' + data + ' &']
-            a_process = Process(target=start_formation, args=(robot, command, error_list, 'startFollowers'))
+            a_process = Process(target=start_formation, args=(robot, command, error_list))
             processes.append(a_process)
 
         for process in processes:
@@ -253,12 +294,12 @@ def start_leader(data, result):
     leader = Robot.objects.get(name="green")
     command = ["cd multi-robotics/robots/Romi-Dual-Leader", "./start_leader.py --" + data + ' &']
     error_list = []
-    start_formation(leader, command, error_list, 'startLeader')
+    start_formation(leader, command, error_list)
     if len(error_list) > 0:
         result['error'] = [x for x in error_list]
 
 
-def start_formation(robot, command, error_list, action):
+def start_formation(robot, command, error_list):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
